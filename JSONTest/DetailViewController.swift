@@ -17,17 +17,21 @@ class DetailViewController: UIViewController {
         didSet {
             // Update the view.
             self.configureView()
+
         }
     }
 
     func configureView() {
         // Update the user interface for the detail item.
-        if let detail = self.detailItem {
-            if let label = self.detailDescriptionLabel {
-                label.text = detail.description
-            }
-        }
-    }
+		guard let users = detailItem as? User where detailDescriptionLabel != nil else { return }
+		var string = ""
+		detailDescriptionLabel.numberOfLines = 0
+		string += "\(users.name) \n"
+		string += "\(users.phone) \n"
+		string += "\(users.email) \n"
+		string += "\(users.website)"
+		detailDescriptionLabel.text? = string
+	}
 
     override func viewDidLoad() {
         super.viewDidLoad()

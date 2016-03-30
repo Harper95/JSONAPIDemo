@@ -10,8 +10,14 @@ import Foundation
 
 public class User {
     public var name:String
+	public var website:String
+	public var email:String
+	public var phone:String
     
-    init(name:String) {
+	init(name:String, website:String, email:String, phone: String) {
         self.name = name
+		self.website = website
+		self.email = email
+		self.phone = phone
     }
 }

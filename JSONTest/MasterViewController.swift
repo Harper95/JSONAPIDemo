@@ -11,10 +11,9 @@ import Alamofire
 import SwiftyJSON
 
 class MasterViewController: UITableViewController {
-
+	
     var detailViewController: DetailViewController? = nil
-    var objects = [AnyObject]()
-
+	var users = [User]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,13 +35,19 @@ class MasterViewController: UITableViewController {
                 if let value = response.result.value {
                     let json = JSON(value)
                     print("JSON: \(json)")
+					// Parse
+					for obj in json.arrayValue {
+						self.users.append(User(name: obj["name"].stringValue, website: obj["website"].stringValue, email: obj["email"].stringValue, phone: obj["phone"].stringValue))
+					}
+					print(self.users.count)
+					self.tableView.reloadData()
                 }
             case .Failure(let error):
                 print(error)
             }
         }
         
-        
+		
     }
 
     override func viewWillAppear(animated: Bool) {
@@ -55,18 +60,18 @@ class MasterViewController: UITableViewController {
         // Dispose of any resources that can be recreated.
     }
 
-    func insertNewObject(sender: AnyObject) {
-        objects.insert(NSDate(), atIndex: 0)
-        let indexPath = NSIndexPath(forRow: 0, inSection: 0)
-        self.tableView.insertRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
-    }
+//    func insertNewObject(sender: AnyObject) {
+//        users.insert(NSDate(), atIndex: 0)
+//        let indexPath = NSIndexPath(forRow: 0, inSection: 0)
+//        self.tableView.insertRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
+//    }
 
     // MARK: - Segues
 
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "showDetail" {
             if let indexPath = self.tableView.indexPathForSelectedRow {
-                let object = objects[indexPath.row] as! NSDate
+                let object = users[indexPath.row]
                 let controller = (segue.destinationViewController as! UINavigationController).topViewController as! DetailViewController
                 controller.detailItem = object
                 controller.navigationItem.leftBarButtonItem = self.splitViewController?.displayModeButtonItem()
@@ -82,14 +87,14 @@ class MasterViewController: UITableViewController {
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return objects.count
+        return users.count
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath)
 
-        let object = objects[indexPath.row] as! NSDate
-        cell.textLabel!.text = object.description
+        let object = users[indexPath.row]
+        cell.textLabel!.text = object.name
         return cell
     }
 
@@ -100,7 +105,7 @@ class MasterViewController: UITableViewController {
 
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            objects.removeAtIndex(indexPath.row)
+            users.removeAtIndex(indexPath.row)
             tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
         } else if editingStyle == .Insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
